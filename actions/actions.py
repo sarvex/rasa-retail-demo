@@ -29,22 +29,16 @@ class ActionProductSearch(Action):
 
         # place cursor on correct row based on search criteria
         cursor.execute("SELECT * FROM inventory WHERE color=? AND size=?", shoe)
-        
-        # retrieve sqlite row
-        data_row = cursor.fetchone()
 
-        if data_row:
+        if data_row := cursor.fetchone():
             # provide in stock message
             dispatcher.utter_message(template="utter_in_stock")
-            connection.close()
-            slots_to_reset = ["size", "color"]
-            return [SlotSet(slot, None) for slot in slots_to_reset]
         else:
             # provide out of stock
             dispatcher.utter_message(template="utter_no_stock")
-            connection.close()
-            slots_to_reset = ["size", "color"]
-            return [SlotSet(slot, None) for slot in slots_to_reset]
+        connection.close()
+        slots_to_reset = ["size", "color"]
+        return [SlotSet(slot, None) for slot in slots_to_reset]
 
 class SurveySubmit(Action):
     def name(self) -> Text:
@@ -82,21 +76,17 @@ class OrderStatus(Action):
 
         # retrieve row based on email
         cursor.execute("SELECT * FROM orders WHERE order_email=?", order_email)
-        data_row = cursor.fetchone()
-
-        if data_row:
+        if data_row := cursor.fetchone():
             # convert tuple to list
             data_list = list(data_row)
 
             # respond with order status
             dispatcher.utter_message(template="utter_order_status", status=data_list[5])
-            connection.close()
-            return []
         else:
             # db didn't have an entry with this email
             dispatcher.utter_message(template="utter_no_order")
-            connection.close()
-            return []
+        connection.close()
+        return []
 
 
 class CancelOrder(Action):
@@ -119,9 +109,7 @@ class CancelOrder(Action):
 
         # retrieve row based on email
         cursor.execute("SELECT * FROM orders WHERE order_email=?", order_email)
-        data_row = cursor.fetchone()
-
-        if data_row:
+        if data_row := cursor.fetchone():
             # change status of entry
             status = [("cancelled"), (tracker.get_slot("email"))]
             cursor.execute("UPDATE orders SET status=? WHERE order_email=?", status)
@@ -130,12 +118,11 @@ class CancelOrder(Action):
 
             # confirm cancellation
             dispatcher.utter_message(template="utter_order_cancel_finish")
-            return []
         else:
             # db didn't have an entry with this email
             dispatcher.utter_message(template="utter_no_order")
             connection.close()
-            return []
+        return []
 
 
 class ReturnOrder(Action):
@@ -158,9 +145,7 @@ class ReturnOrder(Action):
 
         # retrieve row based on email
         cursor.execute("SELECT * FROM orders WHERE order_email=?", order_email)
-        data_row = cursor.fetchone()
-
-        if data_row:
+        if data_row := cursor.fetchone():
             # change status of entry
             status = [("returning"), (tracker.get_slot("email"))]
             cursor.execute("UPDATE orders SET status=? WHERE order_email=?", status)
@@ -169,12 +154,11 @@ class ReturnOrder(Action):
 
             # confirm return
             dispatcher.utter_message(template="utter_return_finish")
-            return []
         else:
             # db didn't have an entry with this email
             dispatcher.utter_message(template="utter_no_order")
             connection.close()
-            return []
+        return []
 
 class GiveName(Action):
     def name(self) -> Text:
