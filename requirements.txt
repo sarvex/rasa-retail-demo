@@ -101,7 +101,7 @@ sanic==20.9.0
 Sanic-Cors==0.10.0.post3
 sanic-jwt==1.4.1
 Sanic-Plugins-Framework==0.9.4.post1
-scikit-learn==0.23.2
+scikit-learn==1.0.1
 scipy==1.5.4
 sentry-sdk==0.19.5
 six==1.15.0
